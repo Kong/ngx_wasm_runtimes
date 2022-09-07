@@ -1,0 +1,131 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Release name (e.g. v0.1.0)'
+        required: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - runtime: v8
+            version: 10.5.18
+            os: ubuntu-20.04
+            cc: gcc-8
+            id: linux-x86_64
+    runs-on: ${{ matrix.os }}
+    env:
+      RETENTION_DAYS: 2
+      # we use matrix.id because can't use runner.os and runner.arch in env
+      TARGET_NAME: ${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}
+      PACKAGE_NAME: ngx_wasm_runtime-${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}.tar.gz
+    environment: release
+    steps:
+      - run: sudo apt-get update && sudo apt-get install -y gcc-8 libstdc++-8-dev
+        if: ${{ matrix.cc == 'gcc-8' }}
+
+      - run: sudo apt-get install -y ninja-build cmake pkg-config python-is-python3
+        if: ${{ matrix.runtime == 'v8' }}
+
+      - uses: actions/checkout@v2
+        with:
+          repository: kong/ngx_wasm_module
+          token: ${{ secrets.GH_PAT }}
+
+      - name: "Setup cache - rustup toolchain"
+        uses: actions/cache@v2
+        if: ${{ !env.ACT }}
+        with:
+          path: |
+            ~/.rustup/settings.toml
+            ~/.rustup/toolchains/*
+            ~/.rustup/update-hashes/*
+          key: rust-toolchain-${{ env.RUNNER_OS }}-${{ hashFiles('.github/**/*.yml', '.github/**/*.sh') }}
+
+      - name: "Setup cache - build target dir"
+        uses: actions/cache@v2
+        if: ${{ !env.ACT }}
+        with:
+          path: |
+            work/
+          key: ${{ env.PACKAGE_NAME }}-work-${{ matrix.os }}-${{ matrix.cc }}-${{ hashFiles('util/**/*.sh', 'util/**/*.pl', 'util/**/*.awk', '.github/**/*.yml', '.github/**/*.sh', '.github/**/*.js', 'rust-toolchain') }}
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+
+      - name: Build Wasm runtime
+        run: |
+          mkdir -p work/${{ env.TARGET_NAME }}
+          mkdir -p work/${{ env.TARGET_NAME }}/lib
+          mkdir -p work/${{ env.TARGET_NAME }}/include
+          util/runtimes/${{ matrix.runtime }}.sh `realpath work/${{ env.TARGET_NAME }}`
+
+      - name: Package Wasm runtime
+        run: |
+          mkdir -p dist
+          cd work
+          tar czvpf ../dist/${{ env.PACKAGE_NAME }} ${{ env.TARGET_NAME }}
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-artifacts
+          path: dist
+          retention-days: ${{ env.RETENTION_DAYS }}
+
+      - id: assign-name
+        run: |
+          if [ "${{ github.event_name }}" = schedule ]; then
+            echo "::set-output name=release_name::nightly-$(date -u +%Y%m%d)"
+          else
+            echo "::set-output name=release_name::${{ github.event.inputs.release_name }}"
+          fi
+
+  upload-artifacts:
+    name: Upload release artifacts
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve sibling release artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: release-artifacts
+
+      - uses: marvinpinto/action-automatic-releases@latest
+        if: ${{ github.event_name == 'schedule' }}
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: nightly
+          prerelease: true
+          title: ${{ needs.build.outputs.release_name }}
+          files: |
+            *.tar.gz
+
+      - uses: marvinpinto/action-automatic-releases@latest
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: release-${{ needs.build.outputs.release_name }}
+          prerelease: true
+          title: ${{ needs.build-images.outputs.release_name }}
+          files: |
+            *.tar.gz
+
+      - uses: marvinpinto/action-automatic-releases@latest
+        if: ${{ github.event_name == 'push' }}
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: latest
+          prerelease: true
+          title: "Latest build"
+          files: |
+            *.tar.gz
