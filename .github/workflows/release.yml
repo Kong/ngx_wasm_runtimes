@@ -47,7 +47,7 @@ jobs:
             ~/.rustup/settings.toml
             ~/.rustup/toolchains/*
             ~/.rustup/update-hashes/*
-          key: rust-toolchain-${{ env.RUNNER_OS }}-${{ hashFiles('.github/**/*.yml', '.github/**/*.sh') }}
+          key: rust-toolchain-${{ env.RUNNER_OS }}-${{ hashFiles('.github/**/*.yml', '.github/**/*.sh') }}-${{ github.sha }}
 
       - name: "Setup cache - build target dir"
         uses: actions/cache@v2
@@ -55,7 +55,7 @@ jobs:
         with:
           path: |
             work/
-          key: ${{ env.PACKAGE_NAME }}-work-${{ matrix.os }}-${{ matrix.cc }}-${{ hashFiles('util/**/*.sh', 'util/**/*.pl', 'util/**/*.awk', '.github/**/*.yml', '.github/**/*.sh', '.github/**/*.js', 'rust-toolchain') }}
+          key: ${{ env.PACKAGE_NAME }}-work-${{ matrix.os }}-${{ matrix.cc }}-${{ hashFiles('util/**/*.sh', 'util/**/*.pl', 'util/**/*.awk', '.github/**/*.yml', '.github/**/*.sh', '.github/**/*.js', 'rust-toolchain') }}-${{ github.sha }}
 
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
