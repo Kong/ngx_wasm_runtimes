@@ -20,6 +20,11 @@ jobs:
             os: ubuntu-20.04
             cc: gcc-8
             id: linux-x86_64
+          - runtime: v8
+            version: 10.5.18
+            os: macos-latest
+            cc: clang
+            id: darwin-x86_64
     runs-on: ${{ matrix.os }}
     env:
       RETENTION_DAYS: 2
@@ -28,10 +33,16 @@ jobs:
       PACKAGE_NAME: ngx_wasm_runtime-${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}.tar.gz
     steps:
       - run: sudo apt-get update && sudo apt-get install -y gcc-8 libstdc++-8-dev
-        if: ${{ matrix.cc == 'gcc-8' }}
+        if: ${{ matrix.os == 'ubuntu-20.04' && matrix.cc == 'gcc-8' }}
 
       - run: sudo apt-get install -y ninja-build cmake pkg-config python-is-python3
-        if: ${{ matrix.runtime == 'v8' }}
+        if: ${{ matrix.os == 'ubuntu-20.04' && matrix.runtime == 'v8' }}
+
+      - run: brew install ninja
+        if: ${{ matrix.os == 'macos-latest' && matrix.runtime == 'v8' }}
+
+      - run: brew install coreutils # for realpath
+        if: ${{ matrix.os == 'macos-latest' }}
 
       - uses: actions/checkout@v2
         with:
