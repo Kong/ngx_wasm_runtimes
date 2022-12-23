@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - '*'
   workflow_dispatch:
     inputs:
       release_name:
@@ -101,6 +104,7 @@ jobs:
 
       - name: Upload binary
         uses: actions/upload-artifact@v2
+        if: ${{ github.event_name != 'pull_request' }}
         with:
           name: release-artifacts
           path: dist
@@ -115,6 +119,7 @@ jobs:
           fi
 
   upload-artifacts:
+    if: ${{ github.event_name != 'pull_request' }}
     name: Upload release artifacts
     needs: [build]
     runs-on: ubuntu-latest
