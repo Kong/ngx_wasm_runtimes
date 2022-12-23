@@ -22,6 +22,11 @@ jobs:
             id: linux-x86_64
           - runtime: v8
             version: 10.5.18
+            os: ubuntu-18.04
+            cc: gcc-8
+            id: ubuntu-18.04-linux-x86_64
+          - runtime: v8
+            version: 10.5.18
             os: macos-latest
             cc: clang
             id: darwin-x86_64
@@ -32,6 +37,14 @@ jobs:
       TARGET_NAME: ${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}
       PACKAGE_NAME: ngx_wasm_runtime-${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}.tar.gz
     steps:
+      - run: sudo apt-get update && sudo apt-get install -y gcc-8 libstdc++-8-dev
+        if: ${{ matrix.os == 'ubuntu-18.04' && matrix.cc == 'gcc-8' }}
+
+      - run: |
+          sudo apt-get install -y ninja-build cmake pkg-config
+          sudo ln -nfs /usr/bin/python3.6 /usr/bin/python
+        if: ${{ matrix.os == 'ubuntu-18.04' && matrix.runtime == 'v8' }}
+
       - run: sudo apt-get update && sudo apt-get install -y gcc-8 libstdc++-8-dev
         if: ${{ matrix.os == 'ubuntu-20.04' && matrix.cc == 'gcc-8' }}
 
