@@ -118,10 +118,50 @@ jobs:
             echo "::set-output name=release_name::${{ github.event.inputs.release_name }}"
           fi
 
+  extract-arm:
+    name: "Extract Ubuntu 20.04 (focal) binary ARM from pre-built Docker image"
+    runs-on: ubuntu-latest
+    env:
+      RETENTION_DAYS: 2
+      VERSION: 10.5.8
+      RUNTIME: v8
+      OS: linux
+      ARCH: arm64
+
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: shrink/actions-docker-extract@v2
+        id: extract
+        with:
+          image: "ghcr.io/kong/ngx-wasm-runtimes:${{ env.RUNTIME }}-${{ env.VERSION }}-${{ env.OS }}-${{ env.ARCH }}"
+          path: "/wasmx/dist"
+      - name: Upload binary
+        uses: actions/upload-artifact@v2
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          name: release-artifacts
+          path: ${{ steps.extract.outputs.destination }}
+          retention-days: ${{ env.RETENTION_DAYS }}
+
+      - id: assign-name
+        run: |
+          if [ "${{ github.event_name }}" = schedule ]; then
+            echo "::set-output name=release_name::nightly-$(date -u +%Y%m%d)"
+          else
+            echo "::set-output name=release_name::${{ github.event.inputs.release_name }}"
+          fi
+
   upload-artifacts:
     if: ${{ github.event_name != 'pull_request' }}
     name: Upload release artifacts
-    needs: [build]
+    needs: [build, extract-arm]
     runs-on: ubuntu-latest
     steps:
       - name: Retrieve sibling release artifacts
