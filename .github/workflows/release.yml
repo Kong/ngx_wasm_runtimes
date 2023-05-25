@@ -128,7 +128,7 @@ jobs:
         id: extract
         with:
           image: "ghcr.io/kong/ngx-wasm-runtimes:${{ env.RUNTIME }}-${{ env.VERSION }}-${{ env.OS }}-${{ env.ARCH }}"
-          path: "/wasmx/dist"
+          path: "/wasmx/dist/"
       - name: Upload binary
         uses: actions/upload-artifact@v2
         if: ${{ github.event_name != 'pull_request' }}
