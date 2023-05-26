@@ -1,4 +1,4 @@
-FROM wasmx-build-ubuntu-arm
+FROM wasmx-build-ubuntu
 
 ARG ARCH
 ARG OS

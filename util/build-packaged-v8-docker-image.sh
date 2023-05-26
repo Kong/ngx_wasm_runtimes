@@ -34,7 +34,7 @@ build_packaged_v8_image() {
 
     docker build \
         -t ghcr.io/kong/ngx-wasm-runtimes:v8-$V8_VERSION-$OS-$ARCH \
-        --platform linux/$ARCH
+        --platform linux/$ARCH \
         --build-arg NGX_WASM_MODULE=$NGX_WASM_MODULE \
         --build-arg OS=$OS \
         --build-arg ARCH=$ARCH \
