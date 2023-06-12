@@ -5,7 +5,7 @@ case $ARCH in
     aarch64) ARCH='arm64';;
 esac
 
-V8_VERSION=10.5.8
+V8_VERSION=10.5.18
 
 NGX_WASM_MODULE=ngx_wasm_module
 DIR_NGX_WASM_MODULE=$PWD/$NGX_WASM_MODULE
