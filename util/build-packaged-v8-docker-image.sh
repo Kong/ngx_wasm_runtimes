@@ -1,4 +1,4 @@
-OS=$(uname -s | tr '[:upper]' '[:lower:]')
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
 case $ARCH in
     x86_64)  ARCH='amd64';;
@@ -9,7 +9,6 @@ V8_VERSION=10.5.18
 
 NGX_WASM_MODULE=ngx_wasm_module
 DIR_NGX_WASM_MODULE=$PWD/$NGX_WASM_MODULE
-
 
 download_ngx_wasm_module() {
     echo "Cloning ngx_wasm_module reposiory..."
@@ -30,7 +29,7 @@ build_wasmx_build_image() {
 }
 
 build_packaged_v8_image() {
-    echo "Building V8..."
+    echo "Building ghcr.io/kong/ngx-wasm-runtimes:v8-$V8_VERSION-$OS-$ARCH"
 
     docker build \
         -t ghcr.io/kong/ngx-wasm-runtimes:v8-$V8_VERSION-$OS-$ARCH \
@@ -40,8 +39,7 @@ build_packaged_v8_image() {
         --build-arg ARCH=$ARCH \
         --build-arg RUNTIME=v8 \
         --build-arg RUNTIME_VERSION=$V8_VERSION \
-        -f ./assets/Dockerfile .
-
+        -f ./assets/Dockerfile . && \
     docker push ghcr.io/kong/ngx-wasm-runtimes:v8-$V8_VERSION-$OS-$ARCH
 }
 
