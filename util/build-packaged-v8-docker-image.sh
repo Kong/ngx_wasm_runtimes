@@ -1,3 +1,12 @@
+#!/usr/bin/env bash
+
+SCRIPT_NAME=$(basename $0)
+NGX_WASM_DIR=${NGX_WASM_DIR:-"$(
+    cd $(dirname $(dirname ${0}))
+    pwd -P
+)"}
+
+
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
 case $ARCH in
@@ -5,7 +14,37 @@ case $ARCH in
     aarch64) ARCH='arm64';;
 esac
 
-V8_VERSION=10.5.18
+get_data_from_action() {
+    local block="$1"
+    local search_k="$2"
+    local search_v="$3"
+    local target_k="$4"
+    local action="$NGX_WASM_DIR/.github/workflows/release.yml"
+
+    # a good-enough YAML-parsing state machine for finding
+    # a key-value pair in a block given another key-value pair
+    awk '
+    function check() {
+        if (!in_block) return;
+        if (sv == "'$search_v'" && tv != "") { print tv; exit; }
+    }
+
+    /'$block':/ { in_block=1; next; }
+    /(name|matrix|runs-on|env|steps|if|needs):/ { check(); in_block=0; }
+    // { if (!in_block) next; }
+
+    /^[[:space:]]*-/             { check(); sv=""; tv=""; }
+    /^[-[:space:]]*'$search_k':/ { sv=$NF; }
+    /^[-[:space:]]*'$target_k':/ { tv=$NF; }
+    ' "$action"
+}
+
+V8_VERSION=${V8_VERSION:-$(get_data_from_action env RUNTIME v8 VERSION)}
+
+if [ -z "$V8_VERSION" ]; then
+    echo "V8 version could not be detected, please set V8_VERSION environment variable." >&2
+    exit 1
+fi
 
 NGX_WASM_MODULE=ngx_wasm_module
 DIR_NGX_WASM_MODULE=$PWD/$NGX_WASM_MODULE
