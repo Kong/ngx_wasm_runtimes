@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       release_name:
-        description: 'Release name (e.g. v0.1.0)'
+        description: 'Release tag (e.g. v8-10.5.18)'
         required: true
 
 jobs:
@@ -170,9 +170,9 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: release-${{ needs.build.outputs.release_name }}
+          automatic_release_tag: ${{ github.event.inputs.release_name }}
           prerelease: true
-          title: ${{ needs.build-images.outputs.release_name }}
+          title: ${{ github.event.inputs.release_name }}
           files: |
             *.tar.gz
 
