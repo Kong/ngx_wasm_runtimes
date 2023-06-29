@@ -19,12 +19,12 @@ jobs:
       matrix:
         include:
           - runtime: v8
-            version: 11.4.183.23
+            version: 10.5.18
             os: ubuntu-20.04
             cc: gcc-8
             id: linux-x86_64
           - runtime: v8
-            version: 11.4.183.23
+            version: 10.5.18
             os: macos-latest
             cc: clang
             id: darwin-x86_64
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RETENTION_DAYS: 2
-      VERSION: 11.4.183.23
+      VERSION: 10.5.18
       RUNTIME: v8
       OS: linux
       ARCH: arm64
