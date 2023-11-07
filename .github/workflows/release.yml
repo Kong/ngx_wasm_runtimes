@@ -18,11 +18,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - runtime: v8
-            version: 11.4.183.23
-            os: ubuntu-20.04
-            cc: gcc-8
-            id: linux-x86_64
+          #          - runtime: v8
+          #            version: 11.4.183.23
+          #            os: ubuntu-20.04
+          #            cc: gcc-8
+          #            id: linux-x86_64
           - runtime: v8
             version: 11.4.183.23
             os: macos-latest
@@ -35,17 +35,18 @@ jobs:
       TARGET_NAME: ${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}
       PACKAGE_NAME: ngx_wasm_runtime-${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}.tar.gz
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y gcc-8 libstdc++-8-dev
-        if: ${{ matrix.os == 'ubuntu-20.04' && matrix.cc == 'gcc-8' }}
+      - name: ubuntu setup
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y gcc-8 libstdc++-8-dev
+          sudo apt-get install -y ninja-build cmake pkg-config python-is-python3
 
-      - run: sudo apt-get install -y ninja-build cmake pkg-config python-is-python3
-        if: ${{ matrix.os == 'ubuntu-20.04' && matrix.runtime == 'v8' }}
-
-      - run: brew install ninja
-        if: ${{ matrix.os == 'macos-latest' && matrix.runtime == 'v8' }}
-
-      - run: brew install coreutils # for realpath
-        if: ${{ matrix.os == 'macos-latest' }}
+      - name: macOS setup
+        if: ${{ matrix.os == 'macos-latest'}}
+        run: |
+          brew install ninja
+          brew install python@3.8
+          brew install coreutils # for realpath
 
       - uses: actions/checkout@v2
         with:
