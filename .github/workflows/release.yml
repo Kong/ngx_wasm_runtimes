@@ -41,11 +41,16 @@ jobs:
           sudo apt-get update && sudo apt-get install -y gcc-8 libstdc++-8-dev
           sudo apt-get install -y ninja-build cmake pkg-config python-is-python3
 
+      - name: macOS inspection
+        if: ${{ matrix.os == 'macos-latest'}}
+        run: |
+          python3 --version
+
       - name: macOS setup
         if: ${{ matrix.os == 'macos-latest'}}
         run: |
           brew install ninja
-          brew install python@3.8
+          brew install python3
           brew install coreutils # for realpath
 
       - uses: actions/checkout@v2
