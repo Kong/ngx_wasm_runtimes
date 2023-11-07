@@ -52,7 +52,6 @@ jobs:
         with:
           repository: kong/ngx_wasm_module
           ref: main
-          token: ${{ secrets.GH_BOT_TOKEN }}
 
       - name: "Setup cache - rustup toolchain"
         uses: actions/cache@v2
