@@ -19,12 +19,12 @@ jobs:
       matrix:
         include:
           - runtime: v8
-            version: 11.4.183.23
+            version: 12.0.267.17
             os: ubuntu-20.04
             cc: gcc-8
             id: linux-x86_64
           - runtime: v8
-            version: 11.4.183.23
+            version: 12.0.267.17
             os: macos-latest
             cc: clang
             id: darwin-x86_64
@@ -106,11 +106,11 @@ jobs:
           fi
 
   extract-arm:
-    name: "Extract Ubuntu 20.04 (focal) binary ARM from pre-built Docker image"
+    name: "Extract Ubuntu 22.04 (jammy) binary ARM from pre-built Docker image"
     runs-on: ubuntu-latest
     env:
       RETENTION_DAYS: 2
-      VERSION: 11.4.183.23
+      VERSION: 12.0.267.17
       RUNTIME: v8
       OS: linux
       ARCH: arm64
