@@ -70,10 +70,8 @@ jobs:
             work/
           key: ${{ env.PACKAGE_NAME }}-work-${{ matrix.os }}-${{ matrix.cc }}-${{ hashFiles('util/**/*.sh', 'util/**/*.pl', 'util/**/*.awk', '.github/**/*.yml', '.github/**/*.sh', '.github/**/*.js', 'rust-toolchain') }}-${{ github.sha }}
 
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
+      - name: "Setup Rust"
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Build Wasm runtime
         run: |
