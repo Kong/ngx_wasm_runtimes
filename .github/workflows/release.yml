@@ -47,6 +47,9 @@ jobs:
       - run: brew install coreutils # for realpath
         if: ${{ matrix.os == 'macos-latest' }}
 
+      - run: pip install setuptools
+        if: ${{ matrix.os == 'macos-latest' && matrix.runtime == 'v8' }}
+
       - uses: actions/checkout@v2
         with:
           repository: kong/ngx_wasm_module
