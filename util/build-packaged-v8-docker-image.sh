@@ -53,7 +53,7 @@ download_ngx_wasm_module() {
     echo "Cloning ngx_wasm_module reposiory..."
 
     if [[ ! -d "$DIR_NGX_WASM_MODULE" ]]; then
-      git clone git@github.com:Kong/ngx_wasm_module.git $NGX_WASM_MODULE
+      git clone https://github.com/kong/ngx_wasm_module.git $NGX_WASM_MODULE
     fi
 }
 

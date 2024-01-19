@@ -11,7 +11,10 @@ ENV PACKAGE_NAME=ngx_wasm_runtime-$RUNTIME-$RUNTIME_VERSION-$OS-$ARCH.tar.gz
 
 COPY ./$NGX_WASM_MODULE /wasmx
 
+RUN apt install python-is-python3
+
 RUN /wasmx/util/runtimes/$RUNTIME.sh /wasmx/work/$TARGET_NAME $RUNTIME_VERSION $ARCH && \
     mkdir -p /wasmx/dist && \
     cd /wasmx/work && \
-    tar czvpf /wasmx/dist/$PACKAGE_NAME $TARGET_NAME
+    tar czvpf /wasmx/dist/$PACKAGE_NAME $TARGET_NAME && \
+    rm -rf /wasmx/work /root/.cache
