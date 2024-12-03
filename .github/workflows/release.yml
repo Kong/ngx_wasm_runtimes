@@ -56,7 +56,7 @@ jobs:
           ref: main
 
       - name: "Setup cache - rustup toolchain"
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         if: ${{ !env.ACT }}
         with:
           path: |
@@ -66,7 +66,7 @@ jobs:
           key: rust-toolchain-${{ env.RUNNER_OS }}-${{ hashFiles('.github/**/*.yml', '.github/**/*.sh') }}-${{ github.sha }}
 
       - name: "Setup cache - build target dir"
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         if: ${{ !env.ACT }}
         with:
           path: |
@@ -91,10 +91,10 @@ jobs:
           tar czvpf ../dist/${{ env.PACKAGE_NAME }} ${{ env.TARGET_NAME }}
 
       - name: Upload binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          name: release-artifacts
+          name: release-artifacts-${{ matrix.os }}-${{ matrix.id }}
           path: dist
           retention-days: ${{ env.RETENTION_DAYS }}
 
@@ -131,10 +131,10 @@ jobs:
           image: "ghcr.io/kong/ngx-wasm-runtimes:${{ env.RUNTIME }}-${{ env.VERSION }}-${{ env.OS }}-${{ env.ARCH }}"
           path: "/wasmx/dist/."
       - name: Upload binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          name: release-artifacts
+          name: release-artifacts-${{ env.OS }}-${{ env.ARCH }}
           path: ${{ steps.extract.outputs.destination }}
           retention-days: ${{ env.RETENTION_DAYS }}
 
@@ -153,9 +153,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Retrieve sibling release artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
-          name: release-artifacts
+          pattern: release-artifacts-*
+          merge-multiple: true
 
       - uses: marvinpinto/action-automatic-releases@latest
         if: ${{ github.event_name == 'schedule' }}
