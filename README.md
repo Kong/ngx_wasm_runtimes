@@ -37,3 +37,15 @@ package.
 [gh_token_docs]: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic
 [gh_write_package]: https://stackoverflow.com/a/72585915
 [ngx_wasm_runtimes_pkg]: https://github.com/orgs/Kong/packages/container/package/ngx-wasm-runtimes
+
+## License
+
+Licenses for the binaries produced by the GitHub Actions produced by
+this repository fall under the licensing terms of their upstream projects.
+See their licensing terms at their upstream repositories:
+
+For V8, see the various `LICENSE.*` files at: https://github.com/v8/v8
+
+The actual GitHub Actions contained in this repository are licensed under
+the terms of the Apache License version 2.0, as stated in this repository's
+[LICENSE](./LICENSE) file.
