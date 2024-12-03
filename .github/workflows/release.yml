@@ -21,7 +21,7 @@ jobs:
           - runtime: v8
             version: 13.1.201.15
             os: ubuntu-20.04
-            cc: gcc-8
+            cc: gcc-10
             id: linux-x86_64
           - runtime: v8
             version: 13.1.201.15
@@ -35,8 +35,8 @@ jobs:
       TARGET_NAME: ${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}
       PACKAGE_NAME: ngx_wasm_runtime-${{ matrix.runtime }}-${{ matrix.version }}-${{ matrix.id }}.tar.gz
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y gcc-8 libstdc++-8-dev
-        if: ${{ matrix.os == 'ubuntu-20.04' && matrix.cc == 'gcc-8' }}
+      - run: sudo apt-get update && sudo apt-get install -y gcc-10 libstdc++-10-dev
+        if: ${{ matrix.os == 'ubuntu-20.04' && matrix.cc == 'gcc-10' }}
 
       - run: sudo apt-get install -y ninja-build cmake pkg-config python-is-python3
         if: ${{ matrix.os == 'ubuntu-20.04' && matrix.runtime == 'v8' }}
