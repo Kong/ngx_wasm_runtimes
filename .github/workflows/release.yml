@@ -81,6 +81,7 @@ jobs:
           mkdir -p work/${{ env.TARGET_NAME }}
           mkdir -p work/${{ env.TARGET_NAME }}/lib
           mkdir -p work/${{ env.TARGET_NAME }}/include
+          export CC=${{ matrix.cc }}
           util/runtimes/${{ matrix.runtime }}.sh `realpath work/${{ env.TARGET_NAME }}`
 
       - name: Package Wasm runtime
