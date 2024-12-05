@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v8-*'
   pull_request:
     branches:
       - '*'
@@ -169,11 +171,19 @@ jobs:
             *.tar.gz
 
       - uses: marvinpinto/action-automatic-releases@latest
+        if: ${{ github.event_name == 'push' && github.event.ref_type == 'tag' && startsWith(github.event.ref, 'v8') }}
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ github.event.ref }}
+          title: ${{ github.event.ref }}
+          files: |
+            *.tar.gz
+
+      - uses: marvinpinto/action-automatic-releases@latest
         if: ${{ github.event_name == 'workflow_dispatch' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: ${{ github.event.inputs.release_name }}
-          prerelease: true
           title: ${{ github.event.inputs.release_name }}
           files: |
             *.tar.gz
