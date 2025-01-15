@@ -74,7 +74,7 @@ jobs:
           key: ${{ env.PACKAGE_NAME }}-work-${{ matrix.os }}-${{ matrix.cc }}-${{ hashFiles('util/**/*.sh', 'util/**/*.pl', 'util/**/*.awk', '.github/**/*.yml', '.github/**/*.sh', '.github/**/*.js', 'rust-toolchain') }}-${{ github.sha }}
 
       - name: "Setup Rust"
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1ff72ee08e3cb84d84adba594e0a297990fc1ed3 # stable
 
       - name: Build Wasm runtime
         run: |
@@ -118,14 +118,14 @@ jobs:
 
     steps:
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@2b82ce82d56a2a04d2637cd93a637ae1b359c0a7 # v2
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7 # v1
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: shrink/actions-docker-extract@v2
+      - uses: shrink/actions-docker-extract@d5f8c4a1f4bf74b6ead147223749e268bc00a376 # v2
         id: extract
         with:
           image: "ghcr.io/kong/ngx-wasm-runtimes:${{ env.RUNTIME }}-${{ env.VERSION }}-${{ env.OS }}-${{ env.ARCH }}"
@@ -158,7 +158,7 @@ jobs:
           pattern: release-artifacts-*
           merge-multiple: true
 
-      - uses: marvinpinto/action-automatic-releases@latest
+      - uses: marvinpinto/action-automatic-releases@d68defdd11f9dcc7f52f35c1b7c236ee7513bcc1
         if: ${{ github.event_name == 'schedule' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -168,7 +168,7 @@ jobs:
           files: |
             *.tar.gz
 
-      - uses: marvinpinto/action-automatic-releases@latest
+      - uses: marvinpinto/action-automatic-releases@d68defdd11f9dcc7f52f35c1b7c236ee7513bcc1
         if: ${{ github.event_name == 'workflow_dispatch' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -178,7 +178,7 @@ jobs:
           files: |
             *.tar.gz
 
-      - uses: marvinpinto/action-automatic-releases@latest
+      - uses: marvinpinto/action-automatic-releases@d68defdd11f9dcc7f52f35c1b7c236ee7513bcc1
         if: ${{ github.event_name == 'push' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
